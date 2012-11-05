@@ -1,4 +1,4 @@
-iMechanic
-=========
+MyMechanic
+==========
 
-EECE 261 iPhone App.
+Mechanic iPhone App for EECE 261
