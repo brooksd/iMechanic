@@ -41,7 +41,78 @@
 
 - (void)doneButtonPressed
 {
-    //Store To Database
+    //Store Car Info To Database
+    sqlite3_stmt    *carinfostatement;
+    const char *dbpath = [@"/Users/jakelogan/carsdata.sqlite" UTF8String];
+    
+    if (sqlite3_open(dbpath, &contactDB) == SQLITE_OK)
+    {
+        NSString *insertSQL = [NSString stringWithFormat:
+                               @"INSERT INTO carinfo (nickname, make, model, mileage) VALUES (\"%@\", \"%@\", \"%@\", \"%@\")",
+                               self.nickname, self.make, self.model, self.mileage];
+        
+        const char *insert_stmt = [insertSQL UTF8String];
+        sqlite3_prepare_v2(contactDB, insert_stmt,
+                           -1, &carinfostatement, NULL);
+        sqlite3_step(carinfostatement);
+        sqlite3_finalize(carinfostatement);
+    }
+    
+    //Prepare Info 
+    UITextField *oildate= (UITextField*)[self.tableView viewWithTag:100];
+    UITextField *oilmiles= (UITextField*)[self.tableView viewWithTag:101];
+    UITextField *oilinterval= (UITextField*)[self.tableView viewWithTag:102];
+    UITextField *tiredate= (UITextField*)[self.tableView viewWithTag:103];
+    UITextField *tiremiles= (UITextField*)[self.tableView viewWithTag:104];
+    UITextField *tireinterval= (UITextField*)[self.tableView viewWithTag:105];
+    UITextField *aligndate= (UITextField*)[self.tableView viewWithTag:106];
+    UITextField *alignmiles= (UITextField*)[self.tableView viewWithTag:107];
+    UITextField *aligninterval= (UITextField*)[self.tableView viewWithTag:108];
+    
+    //Store Oil Info To Database
+    sqlite3_stmt    *oilstatement;
+    if (sqlite3_open(dbpath, &contactDB) == SQLITE_OK)
+    {
+        NSString *insertSQL = [NSString stringWithFormat:
+                               @"INSERT INTO oilinfo (nickname, date, mileage, interval) VALUES (\"%@\", \"%@\", \"%@\", \"%@\")",
+                               self.nickname, oildate.text,oilmiles.text,oilinterval.text];
+        
+        const char *insert_stmt = [insertSQL UTF8String];
+        sqlite3_prepare_v2(contactDB, insert_stmt,-1, &oilstatement, NULL);
+        sqlite3_step(oilstatement);
+        sqlite3_finalize(oilstatement);
+    }
+    
+    //Store Tire Info To Database
+    sqlite3_stmt    *tirestatement;
+    if (sqlite3_open(dbpath, &contactDB) == SQLITE_OK)
+    {
+        NSString *insertSQL = [NSString stringWithFormat:
+                              @"INSERT INTO tireinfo (nickname, date, mileage, interval) VALUES (\"%@\", \"%@\", \"%@\", \"%@\")",
+                               self.nickname, tiredate.text, tiremiles.text, tireinterval.text];
+        
+        const char *insert_stmt = [insertSQL UTF8String];
+        sqlite3_prepare_v2(contactDB, insert_stmt,
+                           -1, &tirestatement, NULL);
+        sqlite3_step(tirestatement);
+        sqlite3_finalize(tirestatement);
+    }
+    
+    //Store Alignment Info To Database
+    sqlite3_stmt    *alignstatement;
+    if (sqlite3_open(dbpath, &contactDB) == SQLITE_OK)
+    {
+        NSString *insertSQL = [NSString stringWithFormat:
+                               @"INSERT INTO aligninfo (nickname, date, mileage, interval) VALUES (\"%@\", \"%@\", \"%@\", \"%@\")",
+                               self.nickname, aligndate.text,alignmiles.text,aligninterval.text];
+        
+        const char *insert_stmt = [insertSQL UTF8String];
+        sqlite3_prepare_v2(contactDB, insert_stmt,
+                           -1, &alignstatement, NULL);
+        sqlite3_step(alignstatement);
+        sqlite3_finalize(alignstatement);
+    }
+    sqlite3_close(contactDB);
     [self.navigationController popToRootViewControllerAnimated:YES];
 }
 
@@ -77,15 +148,15 @@
         inputField.textColor = [UIColor blueColor];
         if ([indexPath row] == 0)
         {
-            inputField.tag = ([indexPath section] * 3 + 0);
+            inputField.tag = ([indexPath section] * 3 + 100);
             cell.textLabel.text = @"Date";
-            inputField.placeholder = @"Ex. mm/dd/year";
+            inputField.placeholder = @"Ex. yyyy-mm-dd";
             inputField.keyboardType = UIKeyboardTypeDefault;
             inputField.returnKeyType = UIReturnKeyNext;
         }
         else if([indexPath row] == 1)
         {
-            inputField.tag = ([indexPath section] * 3 + 1);
+            inputField.tag = ([indexPath section] * 3 + 101);
             cell.textLabel.text = @"Mileage";
             inputField.placeholder = @"Ex. 100000";
             inputField.keyboardType = UIKeyboardTypeNumbersAndPunctuation;
@@ -93,7 +164,7 @@
         }
         else if([indexPath row] == 2)
         {
-            inputField.tag = ([indexPath section] * 3 + 2);
+            inputField.tag = ([indexPath section] * 3 + 102);
             cell.textLabel.text = @"Interval";
             inputField.placeholder = @"Ex. Every 3000 miles";
             inputField.keyboardType = UIKeyboardTypeNumbersAndPunctuation;
@@ -109,7 +180,6 @@
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         inputField.autocorrectionType = UITextAutocorrectionTypeNo;
         inputField.autocapitalizationType = UITextAutocapitalizationTypeNone;
-        inputField.textAlignment = UITextAlignmentLeft;
         inputField.clearButtonMode = UITextFieldViewModeNever; // no clear 'x' button to the right
         inputField.delegate = self;
         [inputField setEnabled: YES];
@@ -164,7 +234,7 @@
     if (nextResponder)
     {
         // Found next responder, so set it
-        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:nextTag % 3 inSection:nextTag / 3];
+        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:(nextTag-100) % 3 inSection:(nextTag-100) / 3];
         [self.tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionBottom animated:YES];
         [nextResponder becomeFirstResponder];
     }

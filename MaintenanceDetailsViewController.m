@@ -23,7 +23,7 @@
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        // Custom initialization
+        
     }
     return self;
 }
@@ -31,48 +31,34 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
     self.carNicknameLabel.text = self.carNickname;
-    sqlite3 *contactDB; //Declaring pointer to database
-    const char *dbpath = [@"/Users/jakelogan/carsdata.sqlite" UTF8String];
-    sqlite3_stmt *statement;
-    NSString *date;
-    if (sqlite3_open(dbpath, &contactDB) == SQLITE_OK)
-    {
-        
-        NSString *querySQL = [NSString stringWithFormat:
-                              @"SELECT oilChangeDate, tireDate, alignDate, oilMiles, tireMiles, alignMiles FROM carsdate WHERE nickname= \"%@\"",self.carNickname];
-        
-        const char *query_stmt = [querySQL UTF8String];
-        if(sqlite3_prepare_v2(contactDB, query_stmt, -1, &statement, NULL) == SQLITE_OK)
-        {
-            if (sqlite3_step(statement) == SQLITE_ROW)
-            {
-                if(self.title == @"Oil Change")
-                {
-                date = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(statement, 0)];
-                self.maintenanceDateLabel.text = date;
-                NSString *mileage = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(statement, 3)];
-                self.mileageLabel.text = mileage;
-                }else if(self.title == @"Tire Rotation"){
-                    date = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(statement, 1)];
-                    self.maintenanceDateLabel.text = date;
-                    NSString *mileage = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(statement, 4)];
-                    self.mileageLabel.text = mileage;
-                }else if(self.title == @"Alignment"){
-                    date = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(statement, 2)];
-                    self.maintenanceDateLabel.text = date;
-                    NSString *mileage = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(statement, 5)];
-                    self.mileageLabel.text = mileage;
-                }
-            }
-        }
-        sqlite3_close(contactDB);
-    }
     
+    const char *dbpath = [@"/Users/jakelogan/carsdata.sqlite" UTF8String];
+    sqlite3_stmt *statement2;
+    NSString* date;
+    NSString* mileage;
+    NSString *querySQL;
+    if (self.title==@"Oil Change"){
+        querySQL=[NSString stringWithFormat:@"SELECT date, mileage FROM oilinfo WHERE nickname= \"%@\"",self.carNickname];
+    }else if (self.title==@"Tire Rotation"){
+        querySQL=[NSString stringWithFormat:@"SELECT date, mileage FROM tireinfo WHERE nickname= \"%@\"",self.carNickname];
+    }else if (self.title==@"Alignment"){
+        querySQL=[NSString stringWithFormat:@"SELECT date, mileage FROM aligninfo WHERE nickname= \"%@\"",self.carNickname];
+    }
+    const char *query_stmt = [querySQL UTF8String];
+    sqlite3_open(dbpath, &contactDB);
+    sqlite3_prepare_v2(contactDB, query_stmt, -1, &statement2, NULL);
+    if(sqlite3_step(statement2)==SQLITE_ROW)
+    {
+        date = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(statement2, 0)];
+        self.maintenanceDateLabel.text = date;
+        mileage = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(statement2, 1)];
+        self.mileageLabel.text = mileage;
+    }
+    sqlite3_finalize(statement2);
+    sqlite3_close(contactDB);
     UIImage *image = [UIImage imageNamed: @"AlertIcon.png"];
     [maintenanceAlert setImage:image];
-    // Do any additional setup after loading the view from its nib.
 }
 
 - (void)didReceiveMemoryWarning

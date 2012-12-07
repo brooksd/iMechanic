@@ -34,6 +34,7 @@
     
     self.carNicknameLabel.text = self.carNickname;
     self.maintenanceTypeLabel.text = self.maintenanceType;
+    self.date.returnKeyType = UIReturnKeyDone;
     // Do any additional setup after loading the view from its nib.
 }
 
@@ -45,8 +46,28 @@
 
 - (IBAction)savePressed:(id)sender
 {
-    // Store To Database
+    const char *dbpath = [@"/Users/jakelogan/carsdata.sqlite" UTF8String];
+    sqlite3_stmt *tirestatement;
+    if (sqlite3_open(dbpath, &contactDB) == SQLITE_OK)
+    {
+        NSString *insertSQL = [NSString stringWithFormat:
+                               @"INSERT INTO test (value, testname) VALUES (\"%@\", \"%@\")",
+                               self.date.text, self.mileage.text];
+        
+        const char *insert_stmt = [insertSQL UTF8String];
+        sqlite3_prepare_v2(contactDB, insert_stmt,
+                           -1, &tirestatement, NULL);
+        sqlite3_step(tirestatement);
+        sqlite3_finalize(tirestatement);
+    }
+    sqlite3_close(contactDB);
     [self.navigationController popViewControllerAnimated:YES];
+}
+
+- (IBAction)backgroundTouched:(id)sender
+{
+    [self.date resignFirstResponder];
+    [self.mileage resignFirstResponder];
 }
 
 @end

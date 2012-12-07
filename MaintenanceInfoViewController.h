@@ -7,7 +7,19 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <sqlite3.h>
 
 @interface MaintenanceInfoViewController : UITableViewController <UITextFieldDelegate>
+{
+    NSMutableArray *infoArray;
+    UILabel *status;
+    NSString *databasePath;
+    sqlite3 *contactDB;
+}
+
+@property (nonatomic, retain) NSString *nickname;
+@property (nonatomic, retain) NSString *make;
+@property (nonatomic, retain) NSString *model;
+@property (nonatomic, retain) NSString *mileage;
 
 @end
