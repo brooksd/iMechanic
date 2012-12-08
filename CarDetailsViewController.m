@@ -34,29 +34,31 @@
     return self;
 }
 
+-(void)viewWillAppear:(BOOL)animated
+{
+    [self viewDidLoad];
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
     /*self.modelLabel.text = @"Ford";
-    self.mileageLabel.text = @"Ford";
-    self.mpdLabel.text = @"Ford";*/
+     self.mileageLabel.text = @"Ford";
+     self.mpdLabel.text = @"Ford";*/
     self.title = @"Car Details";
     self.nickname.text=carNickname;
     
-    sqlite3 *contactDB; //Declaring pointer to database
+    //sqlite3 *contactDB; //Declaring pointer to database
     const char *dbpath = [@"/Users/jakelogan/carsdata.sqlite" UTF8String];
     sqlite3_stmt *statement;
     NSString *make;
     if (sqlite3_open(dbpath, &contactDB) == SQLITE_OK)
     {
-        
         NSString *querySQL = [NSString stringWithFormat:
-                              @"SELECT make, model, miles, (miles/10) as mpd FROM carsdate WHERE nickname= \"%@\"",self.carNickname];
+                              @"SELECT make, model, mileage, (mileage/10) as mpd FROM carinfo WHERE nickname= \"%@\"",self.carNickname];
         
         const char *query_stmt = [querySQL UTF8String];
-        if(sqlite3_prepare_v2(contactDB, query_stmt, -1, &statement, NULL) == SQLITE_OK)
-        {
+        sqlite3_prepare_v2(contactDB, query_stmt, -1, &statement, NULL);
             if (sqlite3_step(statement) == SQLITE_ROW)
             {
                 make = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(statement, 0)];
@@ -68,12 +70,10 @@
                 NSString *mpd = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(statement, 3)];
                 self.mpdLabel.text = mpd;
             }
-        }else{
-            self.makeLabel.text = @"Not Really Chevy";
-        }
+        sqlite3_finalize(statement);
         sqlite3_close(contactDB);
     }
-
+    
     UIImage *image = [UIImage imageNamed: @"AlertIcon.png"];
     [oilAlert setImage:image];
     [tireRotationAlert setImage:image];

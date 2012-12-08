@@ -54,8 +54,34 @@
 
 - (void)nextButtonPressed
 {
-    MaintenanceInfoViewController *maintInfo = [[MaintenanceInfoViewController alloc] init];
     
+    UITextField *makeField= (UITextField*)[self.tableView viewWithTag:100];
+    UITextField *modelField= (UITextField*)[self.tableView viewWithTag:101];
+    UITextField *mileageField= (UITextField*)[self.tableView viewWithTag:102];
+    UITextField *nicknameField= (UITextField*)[self.tableView viewWithTag:103];
+  /*
+    sqlite3_stmt    *statement;
+        const char *dbpath = [@"/Users/jakelogan/carsdata.sqlite" UTF8String];
+        
+        if (sqlite3_open(dbpath, &contactDB) == SQLITE_OK)
+        {
+            NSString *insertSQL = [NSString stringWithFormat:
+                                   @"INSERT INTO carinfo (nickname, make, model, mileage) VALUES (\"%@\", \"%@\", \"%@\", \"%@\")",
+                                   nicknameField.text, makeField.text, modelField.text, mileageField.text];
+            
+            const char *insert_stmt = [insertSQL UTF8String];
+            sqlite3_prepare_v2(contactDB, insert_stmt,
+                               -1, &statement, NULL);
+            sqlite3_step(statement);
+            sqlite3_finalize(statement);
+            sqlite3_close(contactDB);
+    }
+    */
+    MaintenanceInfoViewController *maintInfo = [[MaintenanceInfoViewController alloc] init];
+    maintInfo.nickname = nicknameField.text;
+    maintInfo.make=makeField.text;
+    maintInfo.model=modelField.text;
+    maintInfo.mileage=mileageField.text;
     [self.navigationController pushViewController:maintInfo animated:YES];
 }
 
@@ -93,7 +119,7 @@
             inputField.textColor = [UIColor blueColor];
             if ([indexPath row] == 0)
             {
-                inputField.tag = 0;
+                inputField.tag = 100;
                 cell.textLabel.text = @"Make";
                 inputField.placeholder = @"Ex. Honda";
                 inputField.keyboardType = UIKeyboardTypeDefault;
@@ -101,7 +127,7 @@
             }
             else if([indexPath row] == 1)
             {
-                inputField.tag = 1;
+                inputField.tag = 101;
                 cell.textLabel.text = @"Model";
                 inputField.placeholder = @"Ex. Accord";
                 inputField.keyboardType = UIKeyboardTypeDefault;
@@ -109,15 +135,15 @@
             }
             else if([indexPath row] == 2)
             {
-                inputField.tag = 2;
+                inputField.tag = 102;
                 cell.textLabel.text = @"Mileage";
                 inputField.placeholder = @"Ex. 100000";
-                inputField.keyboardType = UIKeyboardTypeNumbersAndPunctuation;
+                inputField.keyboardType = UIKeyboardTypeNumberPad;
                 inputField.returnKeyType = UIReturnKeyNext;
             }
             else if([indexPath row] == 3)
             {
-                inputField.tag = 3;
+                inputField.tag = 103;
                 cell.textLabel.text = @"Nickname";
                 inputField.placeholder = @"Ex. Son's Car";
                 inputField.keyboardType = UIKeyboardTypeDefault;
@@ -126,7 +152,7 @@
             cell.selectionStyle = UITableViewCellSelectionStyleNone;
             inputField.autocorrectionType = UITextAutocorrectionTypeNo;
             inputField.autocapitalizationType = UITextAutocapitalizationTypeNone;
-            inputField.textAlignment = UITextAlignmentLeft;
+            //inputField.textAlignment = UITextAlignmentLeft;
             inputField.clearButtonMode = UITextFieldViewModeNever; // no clear 'x' button to the right
             inputField.delegate = self;
             [inputField setEnabled: YES];
@@ -138,7 +164,7 @@
 
 - (BOOL)textField:(UITextField *)theTextField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
 {
-    if(theTextField.tag == 2)
+    if(theTextField.tag == 102)
     {
         NSCharacterSet *myCharSet = [NSCharacterSet characterSetWithCharactersInString:@"0123456789"];
         for (int i = 0; i < [string length]; i++)
@@ -174,6 +200,7 @@
     }
     return NO; // We do not want UITextField to insert line-breaks.
 }
+
 /*
 // Override to support conditional editing of the table view.
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath

@@ -9,9 +9,10 @@
 #import <UIKit/UIKit.h>
 #import <sqlite3.h>
 
-@interface UpdateMaintenanceInfoViewController : UIViewController{
+@interface UpdateMaintenanceInfoViewController : UIViewController <UITextFieldDelegate>
+{
     UILabel *status;
-    NSString        *databasePath;
+    NSString *databasePath;
     sqlite3 *contactDB;
 }
 

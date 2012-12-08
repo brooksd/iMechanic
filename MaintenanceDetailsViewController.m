@@ -28,6 +28,11 @@
     return self;
 }
 
+-(void)viewWillAppear:(BOOL)animated
+{
+    [self viewDidLoad];
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -38,11 +43,16 @@
     NSString* date;
     NSString* mileage;
     NSString *querySQL;
-    if (self.title==@"Oil Change"){
+    if (self.title==@"Oil Change")
+    {
         querySQL=[NSString stringWithFormat:@"SELECT date, mileage FROM oilinfo WHERE nickname= \"%@\"",self.carNickname];
-    }else if (self.title==@"Tire Rotation"){
+    }
+    else if (self.title==@"Tire Rotation")
+    {
         querySQL=[NSString stringWithFormat:@"SELECT date, mileage FROM tireinfo WHERE nickname= \"%@\"",self.carNickname];
-    }else if (self.title==@"Alignment"){
+    }
+    else if (self.title==@"Alignment")
+    {
         querySQL=[NSString stringWithFormat:@"SELECT date, mileage FROM aligninfo WHERE nickname= \"%@\"",self.carNickname];
     }
     const char *query_stmt = [querySQL UTF8String];

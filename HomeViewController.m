@@ -31,7 +31,6 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
     self.title = @"iMechanic";
     
     // Uncomment the following line to preserve selection between presentations.
@@ -45,31 +44,7 @@
     //// Query car database and place car nicknames in array /////
     ////////////////////////////////////////////////////////////*/
 
-    NSMutableArray *initCars = [[NSMutableArray alloc] initWithObjects: nil];
-    
-    sqlite3 *contactDB; //Declaring pointer to database
-    const char *dbpath = [@"/Users/jakelogan/carsdata.sqlite" UTF8String];
-    sqlite3_stmt *statement;
-    NSString *nickname;
-    if (sqlite3_open(dbpath, &contactDB) == SQLITE_OK)
-    {
-        NSString *querySQL = [NSString stringWithFormat:
-                              @"SELECT nickname FROM carsdate"];
-        
-        const char *query_stmt = [querySQL UTF8String];
-        if(sqlite3_prepare_v2(contactDB, query_stmt, -1, &statement, NULL) == SQLITE_OK)
-        {
-            if (sqlite3_step(statement)==SQLITE_ROW)
-            {
-                do {
-                    nickname = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(statement, 0)];
-                    [initCars addObject:nickname];
-                } while (sqlite3_step(statement)==SQLITE_ROW);
-            }
-        }
-    }
-    self.carArray = initCars;
-       UIBarButtonItem *flexSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
+    UIBarButtonItem *flexSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
     
     UIBarButtonItem *addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addButtonPressed)];
     
@@ -141,6 +116,28 @@
 
 
 - (void)viewWillAppear:(BOOL)animated {
+    NSMutableArray *initCars = [[NSMutableArray alloc] initWithObjects: nil];
+    self.carArray = initCars;
+    const char *dbpath = [@"/Users/jakelogan/carsdata.sqlite" UTF8String];
+    sqlite3_stmt *statement;
+    NSString *nickname;
+    if (sqlite3_open(dbpath, &contactDB) == SQLITE_OK)
+    {
+        NSString *querySQL = [NSString stringWithFormat:
+                              @"SELECT nickname FROM carinfo"];
+        
+        const char *query_stmt = [querySQL UTF8String];
+        if(sqlite3_prepare_v2(contactDB, query_stmt, -1, &statement, NULL) == SQLITE_OK)
+        {
+            if (sqlite3_step(statement)==SQLITE_ROW)
+            {
+                do {
+                    nickname = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(statement, 0)];
+                    [initCars addObject:nickname];
+                } while (sqlite3_step(statement)==SQLITE_ROW);
+            }
+        }
+    }
     [super viewWillAppear:animated];
     [self.tableView reloadData];
     self.navigationController.toolbarHidden = NO;
