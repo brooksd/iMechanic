@@ -2,8 +2,8 @@
 //  HomeViewController.h
 //  iMechanic
 //
-//  Created by Devin Brooks on 9/23/12.
-//  Copyright (c) 2012 Devin Brooks. All rights reserved.
+//  Created by Devin Brooks, Jake Logan, and J'Darius Bush on 10/10/12.
+//  Copyright (c) 2012 Devin Brooks, Jake Logan, and J'Darius Bush. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
@@ -18,9 +18,7 @@
 }
 
 @property (nonatomic, copy) NSString *nickname;
-
 @property (nonatomic, retain) NSArray *carArray;
-
 @property (strong, nonatomic) IBOutlet UILabel *status;
 
 @end

@@ -2,8 +2,8 @@
 //  MaintenanceInfoViewController.m
 //  iMechanic
 //
-//  Created by Devin Brooks on 9/26/12.
-//  Copyright (c) 2012 Devin Brooks. All rights reserved.
+//  Created by Devin Brooks, Jake Logan, and J'Darius Bush on 10/10/12.
+//  Copyright (c) 2012 Devin Brooks, Jake Logan, and J'Darius Bush. All rights reserved.
 //
 
 #import "MaintenanceInfoViewController.h"
@@ -17,26 +17,15 @@
 - (id)initWithStyle:(UITableViewStyle)style
 {
     self = [super initWithStyle:style];
-    if (self) {
-        // Custom initialization
-    }
     return self;
 }
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
     self.title = @"Maintenance Info";
-    
     UIBarButtonItem *doneButton = [[UIBarButtonItem alloc] initWithTitle:@"Done" style:UIBarButtonItemStyleDone target:self action:@selector(doneButtonPressed)];
     self.navigationItem.rightBarButtonItem = doneButton;
-    
-    // Uncomment the following line to preserve selection between presentations.
-    // self.clearsSelectionOnViewWillAppear = NO;
- 
-    // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-    // self.navigationItem.rightBarButtonItem = self.editButtonItem;
 }
 
 - (void)doneButtonPressed
@@ -58,7 +47,7 @@
         sqlite3_finalize(carinfostatement);
     }
     
-    //Prepare Info 
+    //Prepare Info
     UITextField *oildate= (UITextField*)[self.tableView viewWithTag:100];
     UITextField *oilmiles= (UITextField*)[self.tableView viewWithTag:101];
     UITextField *oilinterval= (UITextField*)[self.tableView viewWithTag:102];
@@ -69,51 +58,86 @@
     UITextField *alignmiles= (UITextField*)[self.tableView viewWithTag:107];
     UITextField *aligninterval= (UITextField*)[self.tableView viewWithTag:108];
     
-    //Store Oil Info To Database
-    sqlite3_stmt    *oilstatement;
-    if (sqlite3_open(dbpath, &contactDB) == SQLITE_OK)
+    if([oilmiles.text length] == 0 || [oildate.text length] == 0 || [oilinterval.text length] == 0 )
     {
-        NSString *insertSQL = [NSString stringWithFormat:
-                               @"INSERT INTO oilinfo (nickname, date, mileage, interval) VALUES (\"%@\", \"%@\", \"%@\", \"%@\")",
-                               self.nickname, oildate.text,oilmiles.text,oilinterval.text];
+        UIAlertView *invalidInput = [[UIAlertView alloc] initWithTitle:@"Required Field(s)"
+                                                               message:@"You must enter a value for all oil fields." delegate:self cancelButtonTitle:@"Dismiss" otherButtonTitles:nil];
+        [invalidInput show];
+    }else{
         
-        const char *insert_stmt = [insertSQL UTF8String];
-        sqlite3_prepare_v2(contactDB, insert_stmt,-1, &oilstatement, NULL);
-        sqlite3_step(oilstatement);
-        sqlite3_finalize(oilstatement);
-    }
-    
-    //Store Tire Info To Database
-    sqlite3_stmt    *tirestatement;
-    if (sqlite3_open(dbpath, &contactDB) == SQLITE_OK)
-    {
-        NSString *insertSQL = [NSString stringWithFormat:
-                              @"INSERT INTO tireinfo (nickname, date, mileage, interval) VALUES (\"%@\", \"%@\", \"%@\", \"%@\")",
-                               self.nickname, tiredate.text, tiremiles.text, tireinterval.text];
+        //Store Oil Info To Database
+        sqlite3_stmt    *oilstatement;
+        if (sqlite3_open(dbpath, &contactDB) == SQLITE_OK)
+        {
+            if([oilinterval.text length] == 0)
+            {
+                oilinterval.text = @"3000";
+            }
+            NSString *insertSQL = [NSString stringWithFormat:
+                                   @"INSERT INTO oilinfo (nickname, date, mileage, interval) VALUES (\"%@\", \"%@\", \"%@\", \"%@\")",
+                                   self.nickname, oildate.text,oilmiles.text,oilinterval.text];
+            
+            const char *insert_stmt = [insertSQL UTF8String];
+            sqlite3_prepare_v2(contactDB, insert_stmt,-1, &oilstatement, NULL);
+            sqlite3_step(oilstatement);
+            sqlite3_finalize(oilstatement);
+        }
         
-        const char *insert_stmt = [insertSQL UTF8String];
-        sqlite3_prepare_v2(contactDB, insert_stmt,
-                           -1, &tirestatement, NULL);
-        sqlite3_step(tirestatement);
-        sqlite3_finalize(tirestatement);
-    }
-    
-    //Store Alignment Info To Database
-    sqlite3_stmt    *alignstatement;
-    if (sqlite3_open(dbpath, &contactDB) == SQLITE_OK)
-    {
-        NSString *insertSQL = [NSString stringWithFormat:
-                               @"INSERT INTO aligninfo (nickname, date, mileage, interval) VALUES (\"%@\", \"%@\", \"%@\", \"%@\")",
-                               self.nickname, aligndate.text,alignmiles.text,aligninterval.text];
+        //Store Tire Info To Database
+        sqlite3_stmt    *tirestatement;
+        if (sqlite3_open(dbpath, &contactDB) == SQLITE_OK)
+        {
+            if([tiredate.text length] == 0)
+            {
+                tiredate.text = @"N/A";
+            }
+            if([tiremiles.text length] == 0)
+            {
+                tiremiles.text = @"N/A";
+            }
+            if([tireinterval.text length] == 0)
+            {
+                tireinterval.text = @"6000";
+            }
+            NSString *insertSQL = [NSString stringWithFormat:
+                                   @"INSERT INTO tireinfo (nickname, date, mileage, interval) VALUES (\"%@\", \"%@\", \"%@\", \"%@\")",
+                                   self.nickname, tiredate.text, tiremiles.text, tireinterval.text];
+            const char *insert_stmt = [insertSQL UTF8String];
+            sqlite3_prepare_v2(contactDB, insert_stmt,
+                               -1, &tirestatement, NULL);
+            sqlite3_step(tirestatement);
+            sqlite3_finalize(tirestatement);
+        }
         
-        const char *insert_stmt = [insertSQL UTF8String];
-        sqlite3_prepare_v2(contactDB, insert_stmt,
-                           -1, &alignstatement, NULL);
-        sqlite3_step(alignstatement);
-        sqlite3_finalize(alignstatement);
+        //Store Alignment Info To Database
+        sqlite3_stmt    *alignstatement;
+        if (sqlite3_open(dbpath, &contactDB) == SQLITE_OK)
+        {
+            if([aligndate.text length] == 0)
+            {
+                aligndate.text = @"N/A";
+            }
+            if([alignmiles.text length] == 0)
+            {
+                alignmiles.text = @"N/A";
+            }
+            if([aligninterval.text length] == 0)
+            {
+                aligninterval.text = @"6000";
+            }
+            NSString *insertSQL = [NSString stringWithFormat:
+                                   @"INSERT INTO aligninfo (nickname, date, mileage, interval) VALUES (\"%@\", \"%@\", \"%@\", \"%@\")",
+                                   self.nickname, aligndate.text,alignmiles.text,aligninterval.text];
+            
+            const char *insert_stmt = [insertSQL UTF8String];
+            sqlite3_prepare_v2(contactDB, insert_stmt,
+                               -1, &alignstatement, NULL);
+            sqlite3_step(alignstatement);
+            sqlite3_finalize(alignstatement);
+        }
+        sqlite3_close(contactDB);
+        [self.navigationController popToRootViewControllerAnimated:YES];
     }
-    sqlite3_close(contactDB);
-    [self.navigationController popToRootViewControllerAnimated:YES];
 }
 
 - (void)didReceiveMemoryWarning
@@ -150,7 +174,7 @@
         {
             inputField.tag = ([indexPath section] * 3 + 100);
             cell.textLabel.text = @"Date";
-            inputField.placeholder = @"Ex. yyyy-mm-dd";
+            inputField.placeholder = @"Ex. mm-dd-yyyy";
             inputField.keyboardType = UIKeyboardTypeDefault;
             inputField.returnKeyType = UIReturnKeyNext;
         }
@@ -166,7 +190,7 @@
         {
             inputField.tag = ([indexPath section] * 3 + 102);
             cell.textLabel.text = @"Interval";
-            inputField.placeholder = @"Ex. Every 3000 miles";
+            inputField.placeholder = @"Ex. 3000";
             inputField.keyboardType = UIKeyboardTypeNumbersAndPunctuation;
             if([indexPath section] != 2)
             {
@@ -205,6 +229,8 @@
             }
         }
     }
+    
+    
     return YES;
 }
 
@@ -245,45 +271,6 @@
     }
     return NO;
 }
-
-/*
-// Override to support conditional editing of the table view.
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    // Return NO if you do not want the specified item to be editable.
-    return YES;
-}
-*/
-
-/*
-// Override to support editing the table view.
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        // Delete the row from the data source
-        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    }   
-    else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-    }   
-}
-*/
-
-/*
-// Override to support rearranging the table view.
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath
-{
-}
-*/
-
-/*
-// Override to support conditional rearranging of the table view.
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    // Return NO if you do not want the item to be re-orderable.
-    return YES;
-}
-*/
 
 #pragma mark - Table view delegate
 

@@ -2,8 +2,8 @@
 //  MaintenanceInfoViewController.h
 //  iMechanic
 //
-//  Created by Devin Brooks on 9/26/12.
-//  Copyright (c) 2012 Devin Brooks. All rights reserved.
+//  Created by Devin Brooks, Jake Logan, and J'Darius Bush on 10/10/12.
+//  Copyright (c) 2012 Devin Brooks, Jake Logan, and J'Darius Bush. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
